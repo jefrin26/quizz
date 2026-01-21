@@ -11,6 +11,7 @@ function Quiz({ questions }) {
   const [lives, setLives] = useState(3);
   const [correctAnswers, setCorrectAnswers] = useState(0);
   const [answered, setAnswered] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(null);
 
   const currentQuestion = questions[currentIndex];
 
@@ -21,6 +22,7 @@ function Quiz({ questions }) {
     setLives(3);
     setCorrectAnswers(0);
     setAnswered(false);
+    setSelectedIndex(null);
   };
 
   const goToNext = useCallback(
@@ -40,24 +42,23 @@ function Quiz({ questions }) {
       } else {
         setCurrentIndex((prev) => prev + 1);
         setAnswered(false);
+        setSelectedIndex(null);
       }
     },
     [currentIndex, questions.length, lives]
   );
 
-  const handleAnswer = (selectedIndex) => {
+  const handleAnswer = (idx) => {
     if (answered) return;
     setAnswered(true);
-    const isCorrect =
-      selectedIndex === currentQuestion.correctAnswer;
+    setSelectedIndex(idx);
+    const isCorrect = idx === currentQuestion.correctAnswer;
     goToNext(isCorrect);
   };
 
   const handleTimeout = useCallback(() => {
-    if (answered) return;
-    setAnswered(true);
     goToNext(false);
-  }, [answered, goToNext]);
+  }, [goToNext]);
 
   if (gameState === "start") {
     return (
@@ -115,6 +116,7 @@ function Quiz({ questions }) {
         data={currentQuestion}
         onAnswer={handleAnswer}
         disabled={answered}
+        selectedIndex={selectedIndex}
       />
     </div>
   );
